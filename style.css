@@ -1,0 +1,446 @@
+/* ========================================
+   Variables — Palette logo Al Hijratu
+======================================== */
+:root {
+    --color-primary:       #1A6B3C;
+    --color-primary-dark:  #155C32;
+    --color-primary-light: #21834A;
+    --color-primary-pale:  #E8F5EE;
+    --color-accent:        #A8D5BB;
+    --color-text-on-primary: #FFFFFF;
+    --color-bg:            #FFFFFF;
+    --color-bg-alt:        #F5F5F0;
+    --color-text:          #2C2C2C;
+    --color-text-muted:    #5A7A65;
+    --color-border:        #A8D5BB;
+    --color-error:         #C0392B;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow:    0 4px 24px rgba(26, 107, 60, 0.10);
+}
+
+/* ========================================
+   Reset
+======================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ========================================
+   Page
+======================================== */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--color-primary-pale);
+    color: var(--color-text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+/* ========================================
+   Conteneur principal
+======================================== */
+.container {
+    background-color: var(--color-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1.5px solid var(--color-accent);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ========================================
+   Logo
+======================================== */
+.logo {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   Titre
+======================================== */
+h1 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 0.25rem;
+}
+
+/* ========================================
+   Sous-titre
+======================================== */
+.subtitle {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   Formulaire
+======================================== */
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+/* ========================================
+   Groupe champ
+======================================== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-primary-dark);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-alt);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--color-primary);
+    background-color: var(--color-bg);
+    box-shadow: 0 0 0 3px rgba(26, 107, 60, 0.12);
+}
+
+.form-group input:invalid:not(:placeholder-shown) {
+    border-color: var(--color-error);
+}
+
+/* ========================================
+   Bouton
+======================================== */
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--color-primary-light);
+}
+
+button[type="submit"]:active {
+    background-color: var(--color-primary-dark);
+    transform: scale(0.98);
+}
+
+/* ========================================
+   Bouton Export Excel
+======================================== */
+.btn-export {
+    width: 100%;
+    padding: 0.65rem;
+    margin-top: 0.75rem;
+    background-color: var(--color-bg);
+    color: var(--color-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-export:hover {
+    background-color: var(--color-primary-pale);
+}
+
+.btn-export:active {
+    background-color: var(--color-accent);
+    transform: scale(0.98);
+}
+
+/* ========================================
+   Admin — Conteneur
+======================================== */
+.admin-container {
+    max-width: 600px;
+}
+
+#zone-admin {
+    display: none;
+    width: 100%;
+}
+
+/* ========================================
+   Admin — Stats
+======================================== */
+.stats {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 1.2rem;
+}
+
+.stat-card {
+    flex: 1;
+    background: var(--color-primary-pale);
+    border: 1.5px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    text-align: center;
+}
+
+.stat-card .number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+}
+
+.stat-card .label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+/* ========================================
+   Admin — Tableau
+======================================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+thead tr {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+thead th {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+    background-color: var(--color-primary-pale);
+}
+
+tbody tr:hover {
+    background-color: var(--color-accent);
+}
+
+tbody td {
+    padding: 0.55rem 0.75rem;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--color-accent);
+    margin-bottom: 1rem;
+}
+
+.empty-msg {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   Admin — Bouton déconnexion
+======================================== */
+.btn-logout {
+    width: 100%;
+    padding: 0.6rem;
+    background: none;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+    background-color: var(--color-primary-pale);
+}
+
+/* ========================================
+   Admin — Message erreur mot de passe
+======================================== */
+.erreur-mdp {
+    color: var(--color-error);
+    font-size: 0.85rem;
+    display: none;
+    margin-top: -0.5rem;
+}
+
+/* ========================================
+   Modal confirmation
+======================================== */
+.overlay-confirmation {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.overlay-confirmation.fade-out {
+    animation: fadeOut 0.4s ease forwards;
+}
+
+.modal-confirmation {
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-primary);
+    padding: 2rem 2rem 1.5rem;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.modal-icon {
+    font-size: 2.8rem;
+    line-height: 1;
+}
+
+.modal-confirmation h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin: 0;
+}
+
+.modal-confirmation p {
+    font-size: 0.95rem;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.modal-merci {
+    color: var(--color-text-muted) !important;
+    font-size: 0.85rem !important;
+}
+
+.modal-confirmation button {
+    margin-top: 0.75rem;
+    padding: 0.55rem 2rem;
+    width: auto;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.modal-confirmation button:hover {
+    background-color: var(--color-primary-light);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* ========================================
+   Admin — Recherche
+======================================== */
+.search-wrap {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.search-wrap input {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-alt);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-wrap input:focus {
+    border-color: var(--color-primary);
+    background-color: var(--color-bg);
+    box-shadow: 0 0 0 3px rgba(26, 107, 60, 0.12);
+}
+
+/* ========================================
+   Admin — Bouton supprimer
+======================================== */
+.btn-supprimer {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    background: none;
+    color: #C0392B;
+    border: 1px solid #C0392B;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-supprimer:hover {
+    background-color: #C0392B;
+    color: white;
+}

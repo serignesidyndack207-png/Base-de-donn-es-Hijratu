@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Al Hijratu</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container admin-container">
+
+        <img src="images/logo.png" alt="Logo Dahira" class="logo">
+        <h1>Espace Administrateur</h1>
+
+        <div id="zone-login" style="width:100%">
+            <p class="subtitle">Accès réservé</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="motdepasse">Mot de passe</label>
+                    <input type="password" id="motdepasse" required placeholder="••••••••">
+                </div>
+                <p id="erreur-mdp" class="erreur-mdp">Mot de passe incorrect.</p>
+                <button type="submit">Se connecter</button>
+            </form>
+        </div>
+
+        <div id="zone-admin">
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number" id="total-membres">0</div>
+                    <div class="label">Membres enregistrés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="derniere-date">—</div>
+                    <div class="label">Dernier ajout</div>
+                </div>
+            </div>
+
+            <div class="search-wrap">
+                <input
+                    type="text"
+                    id="recherche"
+                    placeholder="Rechercher par nom, carte, téléphone..."
+                    oninput="rechercherMembres()"
+                >
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N° Carte</th>
+                            <th>Nom et Prénoms</th>
+                            <th>Téléphone</th>
+                            <th>Email</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableau-membres"></tbody>
+                </table>
+            </div>
+
+            <button onclick="exporterExcel()" class="btn-export">⬇ Exporter vers Excel</button>
+            <button onclick="seDeconnecter()" class="btn-logout">Se déconnecter</button>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
