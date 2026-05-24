@@ -1,14 +1,5 @@
 const MDP = 'Xidma2026';
-const STORAGE_KEY = 'dahira_membres';
-
-function chargerMembres() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-}
-
-function sauvegarderMembres(membres) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(membres));
-}
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXSV78vobc8uUaljGtrdYsXVzqPiJky4-6GEqK4jTcINLOVnOqoSpN_cFQI8Ivy4KM/exec';
 
 document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -22,20 +13,34 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
         zoneAdmin.style.display = 'flex';
         zoneAdmin.style.flexDirection = 'column';
         zoneAdmin.style.alignItems = 'center';
-        afficherTableau(chargerMembres());
+        chargerDepuisSheets();
     } else {
         erreur.style.display = 'block';
     }
 });
 
+// Charger les membres depuis Google Sheets
+function chargerDepuisSheets() {
+    const tbody = document.getElementById('tableau-membres');
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Chargement en cours...</td></tr>`;
+
+    fetch(GOOGLE_SCRIPT_URL)
+        .then(res => res.json())
+        .then(membres => {
+            afficherTableau(membres);
+        })
+        .catch(() => {
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Erreur de chargement. Vérifiez votre connexion.</td></tr>`;
+        });
+}
+
 function afficherTableau(membres) {
     const tbody = document.getElementById('tableau-membres');
     const total = document.getElementById('total-membres');
     const derniere = document.getElementById('derniere-date');
-    const tous = chargerMembres();
 
-    total.textContent = tous.length;
-    derniere.textContent = tous.length > 0 ? tous[tous.length - 1].date : '—';
+    total.textContent = membres.length;
+    derniere.textContent = membres.length > 0 ? membres[membres.length - 1].date : '—';
 
     if (membres.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Aucun membre trouvé.</td></tr>`;
@@ -56,39 +61,38 @@ function afficherTableau(membres) {
             </td>
         </tr>
     `).join('');
+
+    // Stocker pour la recherche et l'export
+    window._membres = membres;
 }
 
+// Recherche
 function rechercherMembres() {
     const terme = document.getElementById('recherche').value.toLowerCase().trim();
-    const membres = chargerMembres();
+    const membres = window._membres || [];
 
     const resultats = membres.filter(m =>
         m.nomprenom.toLowerCase().includes(terme) ||
-        m.idcarte.toLowerCase().includes(terme) ||
+        m.idcarte.toString().toLowerCase().includes(terme) ||
         m.telephone.toLowerCase().includes(terme)
     );
 
     afficherTableau(resultats);
 }
 
+// Supprimer un membre
 function supprimerMembre(idcarte) {
     const confirmer = confirm(`Voulez-vous vraiment supprimer le membre avec la carte N° ${idcarte} ?`);
     if (!confirmer) return;
 
-    let membres = chargerMembres();
-    membres = membres.filter(m => m.idcarte !== idcarte);
-    sauvegarderMembres(membres);
-
-    const terme = document.getElementById('recherche').value.trim();
-    if (terme) {
-        rechercherMembres();
-    } else {
-        afficherTableau(membres);
-    }
+    // Supprimer localement et réafficher
+    window._membres = window._membres.filter(m => m.idcarte != idcarte);
+    afficherTableau(window._membres);
 }
 
+// Export Excel
 function exporterExcel() {
-    const membres = chargerMembres();
+    const membres = window._membres || [];
     if (membres.length === 0) {
         alert('Aucun membre enregistré pour le moment.');
         return;
@@ -107,10 +111,12 @@ function exporterExcel() {
     XLSX.writeFile(wb, 'membres_dahira.xlsx');
 }
 
+// Déconnexion
 function seDeconnecter() {
     document.getElementById('zone-admin').style.display = 'none';
     document.getElementById('zone-login').style.display = 'block';
     document.getElementById('motdepasse').value = '';
     document.getElementById('erreur-mdp').style.display = 'none';
     document.getElementById('recherche').value = '';
+    window._membres = [];
 }
