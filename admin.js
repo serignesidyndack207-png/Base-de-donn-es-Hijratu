@@ -34,13 +34,24 @@ function chargerDepuisSheets() {
         });
 }
 
+// Formater une date ISO en DD/MM/YYYY
+function formaterDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    const jour = String(d.getUTCDate()).padStart(2, '0');
+    const mois = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const annee = d.getUTCFullYear();
+    return `${jour}/${mois}/${annee}`;
+}
+
 function afficherTableau(membres) {
     const tbody = document.getElementById('tableau-membres');
     const total = document.getElementById('total-membres');
     const derniere = document.getElementById('derniere-date');
 
     total.textContent = membres.length;
-    derniere.textContent = membres.length > 0 ? membres[membres.length - 1].date : '—';
+    derniere.textContent = membres.length > 0 ? formaterDate(membres[membres.length - 1].date) : '—';
 
     if (membres.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Aucun membre trouvé.</td></tr>`;
@@ -53,7 +64,7 @@ function afficherTableau(membres) {
             <td>${m.nomprenom}</td>
             <td>${m.telephone}</td>
             <td>${m.email}</td>
-            <td>${m.date}</td>
+            <td>${formaterDate(m.date)}</td>
             <td>
                 <button class="btn-supprimer" onclick="supprimerMembre('${m.idcarte}')">
                     🗑 Supprimer
@@ -102,7 +113,7 @@ function exporterExcel() {
         'Nom et Prénoms': m.nomprenom,
         'Téléphone':      m.telephone,
         'Email':          m.email,
-        'Date':           m.date
+        'Date':           formaterDate(m.date)
     }));
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(donnees);
