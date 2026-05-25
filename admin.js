@@ -19,22 +19,18 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     }
 });
 
-// Charger les membres depuis Google Sheets
 function chargerDepuisSheets() {
     const tbody = document.getElementById('tableau-membres');
     tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Chargement en cours...</td></tr>`;
 
     fetch(GOOGLE_SCRIPT_URL)
         .then(res => res.json())
-        .then(membres => {
-            afficherTableau(membres);
-        })
+        .then(membres => afficherTableau(membres))
         .catch(() => {
             tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Erreur de chargement. Vérifiez votre connexion.</td></tr>`;
         });
 }
 
-// Formater une date ISO en DD/MM/YYYY
 function formaterDate(dateStr) {
     if (!dateStr) return '—';
     const d = new Date(dateStr);
@@ -59,14 +55,14 @@ function afficherTableau(membres) {
     }
 
     tbody.innerHTML = membres.map(m => `
-        <tr>
+        <tr id="ligne-${m.idcarte}">
             <td>${m.idcarte}</td>
             <td>${m.nomprenom}</td>
             <td>${m.telephone}</td>
             <td>${m.email}</td>
             <td>${formaterDate(m.date)}</td>
             <td>
-                <button class="btn-supprimer" onclick="supprimerMembre('${m.idcarte}')">
+                <button class="btn-supprimer" onclick="supprimerMembre('${m.idcarte}', this)">
                     🗑 Supprimer
                 </button>
             </td>
@@ -76,45 +72,53 @@ function afficherTableau(membres) {
     window._membres = membres;
 }
 
-// Recherche
 function rechercherMembres() {
     const terme = document.getElementById('recherche').value.toLowerCase().trim();
     const membres = window._membres || [];
-
     const resultats = membres.filter(m =>
         m.nomprenom.toLowerCase().includes(terme) ||
         m.idcarte.toString().toLowerCase().includes(terme) ||
         m.telephone.toLowerCase().includes(terme)
     );
-
     afficherTableau(resultats);
 }
 
-// ✅ Supprimer un membre réellement dans Google Sheets
-function supprimerMembre(idcarte) {
+// ✅ Suppression réelle dans Google Sheets via text/plain pour éviter le blocage CORS
+function supprimerMembre(idcarte, btn) {
     const confirmer = confirm(`Voulez-vous vraiment supprimer le membre avec la carte N° ${idcarte} ?`);
     if (!confirmer) return;
 
-    document.querySelectorAll('.btn-supprimer').forEach(b => b.disabled = true);
+    btn.disabled = true;
+    btn.textContent = '⏳ Suppression...';
 
     fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'supprimer', idcarte: idcarte })
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'supprimer', idcarte: String(idcarte) })
     })
-    .then(() => {
-        window._membres = window._membres.filter(m => String(m.idcarte) !== String(idcarte));
-        afficherTableau(window._membres);
-        alert(`✅ Membre N° ${idcarte} supprimé avec succès.`);
+    .then(res => res.json())
+    .then(result => {
+        if (result.status === 'supprime' || result.status === 'introuvable') {
+            // Retirer la ligne du tableau et de la mémoire
+            window._membres = window._membres.filter(m => String(m.idcarte) !== String(idcarte));
+            const ligne = document.getElementById(`ligne-${idcarte}`);
+            if (ligne) ligne.remove();
+            // Mettre à jour le compteur
+            document.getElementById('total-membres').textContent = window._membres.length;
+            alert(`✅ Membre N° ${idcarte} supprimé avec succès.`);
+        } else {
+            alert('❌ Erreur inattendue lors de la suppression.');
+            btn.disabled = false;
+            btn.textContent = '🗑 Supprimer';
+        }
     })
     .catch(() => {
-        alert('❌ Erreur lors de la suppression. Vérifiez votre connexion.');
-        document.querySelectorAll('.btn-supprimer').forEach(b => b.disabled = false);
+        alert('❌ Erreur réseau. Vérifiez votre connexion.');
+        btn.disabled = false;
+        btn.textContent = '🗑 Supprimer';
     });
 }
 
-// Export Excel
 function exporterExcel() {
     const membres = window._membres || [];
     if (membres.length === 0) {
@@ -135,7 +139,6 @@ function exporterExcel() {
     XLSX.writeFile(wb, 'membres_dahira.xlsx');
 }
 
-// Déconnexion
 function seDeconnecter() {
     document.getElementById('zone-admin').style.display = 'none';
     document.getElementById('zone-login').style.display = 'block';
