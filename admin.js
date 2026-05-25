@@ -41,13 +41,18 @@ function formaterDate(dateStr) {
     return `${jour}/${mois}/${annee}`;
 }
 
-function afficherTableau(membres) {
+// Le paramètre estRecherche empêche d'écraser window._membres lors d'une recherche
+function afficherTableau(membres, estRecherche = false) {
     const tbody = document.getElementById('tableau-membres');
     const total = document.getElementById('total-membres');
     const derniere = document.getElementById('derniere-date');
 
-    total.textContent = membres.length;
-    derniere.textContent = membres.length > 0 ? formaterDate(membres[membres.length - 1].date) : '—';
+    // On ne met à jour les stats et window._membres que lors du chargement complet
+    if (!estRecherche) {
+        total.textContent = membres.length;
+        derniere.textContent = membres.length > 0 ? formaterDate(membres[membres.length - 1].date) : '—';
+        window._membres = membres;
+    }
 
     if (membres.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Aucun membre trouvé.</td></tr>`;
@@ -68,19 +73,26 @@ function afficherTableau(membres) {
             </td>
         </tr>
     `).join('');
-
-    window._membres = membres;
 }
 
 function rechercherMembres() {
     const terme = document.getElementById('recherche').value.toLowerCase().trim();
     const membres = window._membres || [];
+
+    // Si le champ est vide, on réaffiche tout
+    if (!terme) {
+        afficherTableau(membres);
+        return;
+    }
+
     const resultats = membres.filter(m =>
         m.nomprenom.toLowerCase().includes(terme) ||
         m.idcarte.toString().toLowerCase().includes(terme) ||
         m.telephone.toLowerCase().includes(terme)
     );
-    afficherTableau(resultats);
+
+    // On passe estRecherche=true pour ne pas écraser window._membres
+    afficherTableau(resultats, true);
 }
 
 // ✅ Suppression réelle dans Google Sheets via text/plain pour éviter le blocage CORS
