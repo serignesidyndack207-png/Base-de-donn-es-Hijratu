@@ -73,7 +73,6 @@ function afficherTableau(membres) {
         </tr>
     `).join('');
 
-    // Stocker pour la recherche et l'export
     window._membres = membres;
 }
 
@@ -91,14 +90,28 @@ function rechercherMembres() {
     afficherTableau(resultats);
 }
 
-// Supprimer un membre
+// ✅ Supprimer un membre réellement dans Google Sheets
 function supprimerMembre(idcarte) {
     const confirmer = confirm(`Voulez-vous vraiment supprimer le membre avec la carte N° ${idcarte} ?`);
     if (!confirmer) return;
 
-    // Supprimer localement et réafficher
-    window._membres = window._membres.filter(m => m.idcarte != idcarte);
-    afficherTableau(window._membres);
+    document.querySelectorAll('.btn-supprimer').forEach(b => b.disabled = true);
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'supprimer', idcarte: idcarte })
+    })
+    .then(() => {
+        window._membres = window._membres.filter(m => String(m.idcarte) !== String(idcarte));
+        afficherTableau(window._membres);
+        alert(`✅ Membre N° ${idcarte} supprimé avec succès.`);
+    })
+    .catch(() => {
+        alert('❌ Erreur lors de la suppression. Vérifiez votre connexion.');
+        document.querySelectorAll('.btn-supprimer').forEach(b => b.disabled = false);
+    });
 }
 
 // Export Excel
