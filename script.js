@@ -5,19 +5,15 @@ function chargerMembres() {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
 }
-
 function sauvegarderMembres(membres) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(membres));
 }
-
 function afficherConfirmation(nom) {
     const ancien = document.getElementById('msg-confirmation');
     if (ancien) ancien.remove();
-
     const overlay = document.createElement('div');
     overlay.id = 'msg-confirmation';
     overlay.className = 'overlay-confirmation';
-
     overlay.innerHTML = `
         <div class="modal-confirmation">
             <div class="modal-icon">✅</div>
@@ -27,19 +23,15 @@ function afficherConfirmation(nom) {
             <button onclick="fermerConfirmation()">Fermer</button>
         </div>
     `;
-
     document.body.appendChild(overlay);
     setTimeout(() => fermerConfirmation(), 5000);
 }
-
 function afficherErreur() {
     const ancien = document.getElementById('msg-confirmation');
     if (ancien) ancien.remove();
-
     const overlay = document.createElement('div');
     overlay.id = 'msg-confirmation';
     overlay.className = 'overlay-confirmation';
-
     overlay.innerHTML = `
         <div class="modal-confirmation">
             <div class="modal-icon">❌</div>
@@ -48,11 +40,9 @@ function afficherErreur() {
             <button onclick="fermerConfirmation()">Fermer</button>
         </div>
     `;
-
     document.body.appendChild(overlay);
     setTimeout(() => fermerConfirmation(), 5000);
 }
-
 function fermerConfirmation() {
     const msg = document.getElementById('msg-confirmation');
     if (msg) {
@@ -63,7 +53,6 @@ function fermerConfirmation() {
 
 document.getElementById('memberForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
     const membre = {
         idcarte:   document.getElementById('idcarte').value.trim(),
         nomprenom: document.getElementById('nomprenom').value.trim(),
@@ -72,38 +61,76 @@ document.getElementById('memberForm').addEventListener('submit', function(e) {
         date:      new Date().toLocaleDateString('fr-FR')
     };
 
-    // Vérifier doublon local
-    const membres = chargerMembres();
-    const doublon = membres.find(m => m.idcarte === membre.idcarte);
-    if (doublon) {
-        alert(`⚠️ Le numéro de carte "${membre.idcarte}" existe déjà.`);
-        return;
-    }
-
-    // Désactiver le bouton pendant l'envoi
+    // Désactiver le bouton pendant la vérification
     const btn = this.querySelector('button[type="submit"]');
     btn.disabled = true;
-    btn.textContent = 'Envoi en cours...';
+    btn.textContent = 'Vérification...';
 
-    // Envoyer vers Google Sheets
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(membre)
-    })
-    .then(() => {
-        // Sauvegarder aussi en local
-        membres.push(membre);
-        sauvegarderMembres(membres);
-        afficherConfirmation(membre.nomprenom);
-        document.getElementById('memberForm').reset();
-    })
-    .catch(() => {
-        afficherErreur();
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.textContent = 'Enregistrer';
-    });
+    // ✅ Vérifier le doublon directement dans Google Sheets (source de vérité)
+    fetch(GOOGLE_SCRIPT_URL)
+        .then(res => res.json())
+        .then(membresSheets => {
+            // Synchroniser le localStorage avec les données réelles de Sheets
+            sauvegarderMembres(membresSheets);
+
+            const doublon = membresSheets.find(m => String(m.idcarte) === String(membre.idcarte));
+            if (doublon) {
+                alert(`⚠️ Le numéro de carte "${membre.idcarte}" existe déjà.`);
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+                return;
+            }
+
+            // Pas de doublon → envoyer vers Google Sheets
+            btn.textContent = 'Envoi en cours...';
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(membre)
+            })
+            .then(() => {
+                // Mettre à jour le localStorage avec le nouveau membre
+                const membresLocaux = chargerMembres();
+                membresLocaux.push(membre);
+                sauvegarderMembres(membresLocaux);
+                afficherConfirmation(membre.nomprenom);
+                document.getElementById('memberForm').reset();
+            })
+            .catch(() => {
+                afficherErreur();
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+            });
+        })
+        .catch(() => {
+            // Si impossible de joindre Sheets, fallback sur localStorage
+            const membresLocaux = chargerMembres();
+            const doublon = membresLocaux.find(m => String(m.idcarte) === String(membre.idcarte));
+            if (doublon) {
+                alert(`⚠️ Le numéro de carte "${membre.idcarte}" existe déjà.`);
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+                return;
+            }
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(membre)
+            })
+            .then(() => {
+                membresLocaux.push(membre);
+                sauvegarderMembres(membresLocaux);
+                afficherConfirmation(membre.nomprenom);
+                document.getElementById('memberForm').reset();
+            })
+            .catch(() => afficherErreur())
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+            });
+        });
 });
