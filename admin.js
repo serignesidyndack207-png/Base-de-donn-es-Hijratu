@@ -27,14 +27,24 @@ function chargerDepuisSheets() {
         .then(res => res.json())
         .then(membres => {
             window._membres = membres;
-            rendreTableau();
-            document.getElementById('total-membres').textContent = membres.length;
-            document.getElementById('derniere-date').textContent =
-                membres.length > 0 ? formaterDate(membres[membres.length - 1].date) : '—';
+            afficherTableau(membres);
+            // Brancher le bouton et la touche Entrée une fois connecté
+            document.getElementById('btn-rechercher').addEventListener('click', filtrer);
+            document.getElementById('recherche').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') filtrer();
+            });
         })
         .catch(() => {
             tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Erreur de chargement. Vérifiez votre connexion.</td></tr>`;
         });
+}
+
+function filtrer() {
+    const terme = document.getElementById('recherche').value.toLowerCase().trim();
+    const lignes = document.querySelectorAll('#tableau-membres tr[id^="ligne-"]');
+    lignes.forEach(tr => {
+        tr.style.display = tr.textContent.toLowerCase().includes(terme) ? '' : 'none';
+    });
 }
 
 function formaterDate(dateStr) {
@@ -47,20 +57,11 @@ function formaterDate(dateStr) {
     return `${jour}/${mois}/${annee}`;
 }
 
-// Filtre les lignes déjà présentes dans le DOM — pas de re-rendu
-function rechercherMembres() {
-    const terme = document.getElementById('recherche').value.toLowerCase().trim();
-    const lignes = document.querySelectorAll('#tableau-membres tr[id^="ligne-"]');
-
-    lignes.forEach(tr => {
-        const texte = tr.textContent.toLowerCase();
-        tr.style.display = texte.includes(terme) ? '' : 'none';
-    });
-}
-
-function rendreTableau() {
-    const membres = window._membres || [];
+function afficherTableau(membres) {
     const tbody = document.getElementById('tableau-membres');
+    document.getElementById('total-membres').textContent = membres.length;
+    document.getElementById('derniere-date').textContent =
+        membres.length > 0 ? formaterDate(membres[membres.length - 1].date) : '—';
 
     if (membres.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Aucun membre trouvé.</td></tr>`;
