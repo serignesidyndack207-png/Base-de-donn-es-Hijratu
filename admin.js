@@ -25,7 +25,13 @@ function chargerDepuisSheets() {
 
     fetch(GOOGLE_SCRIPT_URL)
         .then(res => res.json())
-        .then(membres => afficherTableau(membres))
+        .then(membres => {
+            window._membres = membres;
+            rendreTableau();
+            document.getElementById('total-membres').textContent = membres.length;
+            document.getElementById('derniere-date').textContent =
+                membres.length > 0 ? formaterDate(membres[membres.length - 1].date) : '—';
+        })
         .catch(() => {
             tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Erreur de chargement. Vérifiez votre connexion.</td></tr>`;
         });
@@ -41,18 +47,20 @@ function formaterDate(dateStr) {
     return `${jour}/${mois}/${annee}`;
 }
 
-// Le paramètre estRecherche empêche d'écraser window._membres lors d'une recherche
-function afficherTableau(membres, estRecherche = false) {
-    const tbody = document.getElementById('tableau-membres');
-    const total = document.getElementById('total-membres');
-    const derniere = document.getElementById('derniere-date');
+// Filtre les lignes déjà présentes dans le DOM — pas de re-rendu
+function rechercherMembres() {
+    const terme = document.getElementById('recherche').value.toLowerCase().trim();
+    const lignes = document.querySelectorAll('#tableau-membres tr[id^="ligne-"]');
 
-    // On ne met à jour les stats et window._membres que lors du chargement complet
-    if (!estRecherche) {
-        total.textContent = membres.length;
-        derniere.textContent = membres.length > 0 ? formaterDate(membres[membres.length - 1].date) : '—';
-        window._membres = membres;
-    }
+    lignes.forEach(tr => {
+        const texte = tr.textContent.toLowerCase();
+        tr.style.display = texte.includes(terme) ? '' : 'none';
+    });
+}
+
+function rendreTableau() {
+    const membres = window._membres || [];
+    const tbody = document.getElementById('tableau-membres');
 
     if (membres.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Aucun membre trouvé.</td></tr>`;
@@ -75,27 +83,6 @@ function afficherTableau(membres, estRecherche = false) {
     `).join('');
 }
 
-function rechercherMembres() {
-    const terme = document.getElementById('recherche').value.toLowerCase().trim();
-    const membres = window._membres || [];
-
-    // Si le champ est vide, on réaffiche tout
-    if (!terme) {
-        afficherTableau(membres);
-        return;
-    }
-
-    const resultats = membres.filter(m =>
-        m.nomprenom.toLowerCase().includes(terme) ||
-        m.idcarte.toString().toLowerCase().includes(terme) ||
-        m.telephone.toLowerCase().includes(terme)
-    );
-
-    // On passe estRecherche=true pour ne pas écraser window._membres
-    afficherTableau(resultats, true);
-}
-
-// ✅ Suppression réelle dans Google Sheets via text/plain pour éviter le blocage CORS
 function supprimerMembre(idcarte, btn) {
     const confirmer = confirm(`Voulez-vous vraiment supprimer le membre avec la carte N° ${idcarte} ?`);
     if (!confirmer) return;
@@ -111,11 +98,9 @@ function supprimerMembre(idcarte, btn) {
     .then(res => res.json())
     .then(result => {
         if (result.status === 'supprime' || result.status === 'introuvable') {
-            // Retirer la ligne du tableau et de la mémoire
             window._membres = window._membres.filter(m => String(m.idcarte) !== String(idcarte));
             const ligne = document.getElementById(`ligne-${idcarte}`);
             if (ligne) ligne.remove();
-            // Mettre à jour le compteur
             document.getElementById('total-membres').textContent = window._membres.length;
             alert(`✅ Membre N° ${idcarte} supprimé avec succès.`);
         } else {
