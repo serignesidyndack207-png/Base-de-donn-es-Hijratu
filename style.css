@@ -1,4 +1,196 @@
-/* À ajouter dans style.css — section Recherche */
+/* ===========================
+   VARIABLES & RESET
+   =========================== */
+:root {
+    --color-primary: #1a6b3c;
+    --color-primary-light: #25a05a;
+    --color-primary-dark: #134d2b;
+    --color-accent: #c8a84b;
+    --color-bg: #f4f7f5;
+    --color-bg-alt: #ffffff;
+    --color-text: #1a2e22;
+    --color-text-muted: #5a7a65;
+    --color-border: #c5d9cc;
+    --color-error: #c0392b;
+    --color-success: #1a6b3c;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 2px 8px rgba(26, 107, 60, 0.08);
+    --shadow-md: 0 4px 24px rgba(26, 107, 60, 0.13);
+    --shadow-lg: 0 8px 40px rgba(26, 107, 60, 0.18);
+    --font-main: 'Georgia', 'Times New Roman', serif;
+    --font-ui: 'Segoe UI', system-ui, sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-ui);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(26, 107, 60, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(200, 168, 75, 0.05) 0%, transparent 60%);
+}
+
+/* ===========================
+   CONTAINER PRINCIPAL
+   =========================== */
+.container {
+    background-color: var(--color-bg-alt);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    border: 1px solid rgba(197, 217, 204, 0.5);
+    animation: fadeInUp 0.5s ease both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===========================
+   LOGO
+   =========================== */
+.logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-bottom: 1.2rem;
+    border-radius: 50%;
+    border: 3px solid var(--color-accent);
+    padding: 4px;
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ===========================
+   TITRES
+   =========================== */
+h1 {
+    font-family: var(--font-main);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    line-height: 1.4;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.01em;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+/* ===========================
+   FORMULAIRE
+   =========================== */
+#memberForm {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    letter-spacing: 0.02em;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.7rem 0.95rem;
+    font-size: 0.95rem;
+    font-family: var(--font-ui);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--color-primary);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(26, 107, 60, 0.12);
+}
+
+.form-group input::placeholder {
+    color: #aac4b2;
+}
+
+.form-group input:invalid:not(:placeholder-shown) {
+    border-color: var(--color-error);
+}
+
+/* ===========================
+   BOUTON SUBMIT
+   =========================== */
+button[type="submit"] {
+    margin-top: 0.5rem;
+    width: 100%;
+    padding: 0.85rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--font-ui);
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(26, 107, 60, 0.25);
+}
+
+button[type="submit"]:hover {
+    background-color: var(--color-primary-light);
+    box-shadow: 0 4px 16px rgba(26, 107, 60, 0.3);
+}
+
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* ===========================
+   SECTION RECHERCHE
+   =========================== */
 .search-wrap {
     width: 100%;
     margin-bottom: 1rem;
@@ -41,4 +233,82 @@
 
 #btn-rechercher:hover {
     background-color: var(--color-primary-light);
+}
+
+/* ===========================
+   MESSAGES DE RETOUR
+   =========================== */
+.message {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.message.success {
+    background-color: rgba(26, 107, 60, 0.1);
+    color: var(--color-success);
+    border: 1px solid rgba(26, 107, 60, 0.25);
+}
+
+.message.error {
+    background-color: rgba(192, 57, 43, 0.08);
+    color: var(--color-error);
+    border: 1px solid rgba(192, 57, 43, 0.2);
+}
+
+/* ===========================
+   TABLE MEMBRES (admin)
+   =========================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+table thead {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+table thead th {
+    padding: 0.75rem 0.9rem;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+table tbody tr {
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.15s;
+}
+
+table tbody tr:hover {
+    background-color: rgba(26, 107, 60, 0.05);
+}
+
+table tbody td {
+    padding: 0.7rem 0.9rem;
+    color: var(--color-text);
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+@media (max-width: 500px) {
+    .container {
+        padding: 1.75rem 1.25rem;
+    }
+
+    h1 {
+        font-size: 1.1rem;
+    }
+
+    .logo {
+        width: 80px;
+        height: 80px;
+    }
 }
