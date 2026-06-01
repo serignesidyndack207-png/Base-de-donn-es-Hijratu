@@ -1,4 +1,4 @@
-const MDP = 'Xidma2026';
+const MDP = 'Xidma2026@';
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXSV78vobc8uUaljGtrdYsXVzqPiJky4-6GEqK4jTcINLOVnOqoSpN_cFQI8Ivy4KM/exec';
 
 document.getElementById('loginForm').addEventListener('submit', function(e) {
